@@ -30,12 +30,18 @@ pub mod websocket;
 /// loaded, and it set up all the objects and callbacks that keep the web
 /// application running.
 #[wasm_bindgen(start)]
-pub fn main() -> Result<(), JsValue> {
+pub fn maia_init() {
+    std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+}
+
+/// Mounts the waterfall plot.
+#[wasm_bindgen]
+pub fn waterfall(id: String) -> Result<(), JsValue> {
     let window = Rc::new(web_sys::window().ok_or("unable to get window")?);
     let document = Rc::new(window.document().ok_or("unable to get document")?);
     let canvas = Rc::new(
         document
-            .get_element_by_id("canvas")
+            .get_element_by_id(&id)
             .ok_or("unable to get #canvas element")?
             .dyn_into::<web_sys::HtmlCanvasElement>()?,
     );
@@ -50,16 +56,16 @@ pub fn main() -> Result<(), JsValue> {
         &mut render_engine.borrow_mut(),
         window.performance().ok_or("unable to get performance")?,
     )?));
-    WebSocketClient::start(&window, Rc::clone(&waterfall))?;
-    let ui = Ui::new(
-        Rc::clone(&window),
-        Rc::clone(&document),
-        Rc::clone(&render_engine),
-        Rc::clone(&waterfall),
-    )?;
-    let waterfall_interaction =
-        WaterfallInteraction::new(Rc::clone(&render_engine), canvas, ui, Rc::clone(&waterfall));
-    waterfall_interaction.set_callbacks();
+    WebSocketClient::start(Rc::clone(&waterfall), "ws://127.0.0.1:9001".to_string())?;
+    // let ui = Ui::new(
+    //     Rc::clone(&window),
+    //     Rc::clone(&document),
+    //     Rc::clone(&render_engine),
+    //     Rc::clone(&waterfall),
+    // )?;
+    // let waterfall_interaction =
+    //     WaterfallInteraction::new(Rc::clone(&render_engine), canvas, ui, Rc::clone(&waterfall));
+    // waterfall_interaction.set_callbacks();
 
     let f = Rc::new(RefCell::new(None));
     let g = f.clone();

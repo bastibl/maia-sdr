@@ -35,12 +35,9 @@ impl WebSocketClient {
     /// for the WebSocket client. No further interaction with the
     /// `WebSocketClient` returned by this function is needed and it can be
     /// dropped immediately.
-    pub fn start(window: &Window, waterfall: Rc<RefCell<Waterfall>>) -> Result<(), JsValue> {
-        let location = window.location();
-        let hostname = location.hostname()?;
-        let port = location.port()?;
+    pub fn start(waterfall: Rc<RefCell<Waterfall>>, url: String) -> Result<(), JsValue> {
         let data = Rc::new(WebSocketData {
-            url: format!("ws://{hostname}:{port}/waterfall"),
+            url,
             onmessage: onmessage(waterfall).into_js_value(),
             onclose: RefCell::new(None),
         });

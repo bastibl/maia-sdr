@@ -107,8 +107,8 @@ impl Waterfall {
             zoom_levels: Vec::new(),
             freq_num_idx: Rc::new(Cell::new(0)),
             freq_num_idx_ticks: Rc::new(Cell::new(0)),
-            waterfall_min: 35.0,
-            waterfall_max: 85.0,
+            waterfall_min: -100.0,
+            waterfall_max: 0.0,
         };
 
         w.update_waterfall_scale();
@@ -136,9 +136,9 @@ impl Waterfall {
         spectrum_linear.copy_to(spectrum_texture);
         // Convert to "dB". We don't include the 10.0 factor to save us a multiplication.
         // This will later be taken into account in the shader.
-        for x in spectrum_texture.iter_mut() {
-            *x = x.log10();
-        }
+        // for x in spectrum_texture.iter_mut() {
+        //     *x = x.log10();
+        // }
     }
 
     /// Updates the waterfall for rendering.
